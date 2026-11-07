@@ -50,6 +50,25 @@ import cv2; print(cv2.__version__, cv2.cuda.getCudaEnabledDeviceCount())
 
 A progress line for every step and any failure label is appended to `C:\build\build.log`, followed by the full CMake and Ninja output.
 
+## Pip wheel
+
+If `make_wheel.py` sits next to the script, the last step packs the finished build into `C:\build\wheel\opencv_cuda_custom-<ver>+cuda<ver>-cp312-cp312-win_amd64.whl`
+(OpenCV DLLs bundled, relocatable loader config, no absolute `C:\build` paths). You can also run it by hand:
+
+```bat
+python make_wheel.py --cv2-dir <site-packages>\cv2 --bin-dir C:\build\install\x64\vc18\bin --out C:\build\wheel --version 4.14.0 --cuda 13.5
+```
+
+Install it into any venv with the same Python minor version:
+
+```bat
+pip uninstall -y opencv-python opencv-contrib-python opencv-python-headless opencv-contrib-python-headless
+pip install --force-reinstall C:\build\wheel\opencv_cuda_custom-4.14.0+cuda13.5-cp312-cp312-win_amd64.whl
+```
+
+CUDA Toolkit and cuDNN DLLs are **not** bundled: the target machine needs the NVIDIA driver and the same CUDA major version
+(found via `CUDA_PATH` or the default install folder), plus cuDNN if `cv2.dnn` on CUDA is used.
+
 ## Check the result
 
 ```bat

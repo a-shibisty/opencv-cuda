@@ -15,6 +15,7 @@ rem                          [--arch 7.5] [--python C:\path\to\python.exe]
 rem
 rem  Sources: C:\build\opencv and C:\build\opencv_contrib (reused if present)
 rem  Result:  C:\build\install  and the cv2 package inside the chosen Python site-packages
+rem  Wheel:   C:\build\wheel\*.whl  (if make_wheel.py is next to this script)
 rem  Log:     C:\build\build.log
 rem =====================================================================
 
@@ -332,6 +333,14 @@ echo.
 echo [verify] import cv2 ...
 "%PYEXE%" -c "import cv2;print('OpenCV',cv2.__version__);print('CUDA devices:',cv2.cuda.getCudaEnabledDeviceCount())"
 if errorlevel 1 goto fail_verify
+
+rem ---- 16. pip wheel ----
+>> "%LOG%" echo [%time%] STEP 16. pip wheel
+if not exist "%~dp0make_wheel.py" goto no_wheel
+echo.
+echo [wheel] packing the build into a pip wheel ...
+"%PYEXE%" "%~dp0make_wheel.py" --cv2-dir "%PYSITE%\cv2" --bin-dir "%OCV_BIN%" --out "%ROOT%\wheel" --version %OPENCV_VERSION% --cuda %CUDA_VER%
+:no_wheel
 
 echo.
 echo ============================================================
